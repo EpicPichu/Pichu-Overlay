@@ -1,19 +1,42 @@
-import sys, threading, asyncio
-from PyQt5.QtWidgets import QApplication, QMainWindow
+import sys, threading, asyncio, json
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from main_window import Ui_MainWindow
 
 from variables import *
-from name import Logger
+from player_capture import Logger
 from table_constructor import table_row
 from pika_stats import stats as bwstats
-
-initial_content = start + sample_row + header + clientname + initial_end
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()  # Instantiate the UI class
         self.ui.setupUi(self)      # Set up the UI in this window
+
+    def show_alert(self):
+        """Show an alert window"""
+        alert = QMessageBox(self)
+        alert.setWindowTitle("Alert")
+        alert.setText("Restart this app to apply changes.")
+        alert.setIcon(QMessageBox.Information)  # Icon types: Information, Warning, Critical, Question
+        alert.setStandardButtons(QMessageBox.Ok)  # Add buttons
+        alert.setDefaultButton(QMessageBox.Ok)  # Set the default button
+
+        alert.exec_()
+
+try:
+    with open(config_path, 'r') as file:
+        config = json.load(file)
+except FileNotFoundError:
+    with open(config_path, "w") as file:
+        json.dump(config_template, file, indent=4)
+
+client = config['Client']
+
+log_path = log_paths.get(client)
+client_div = div_clients.get(client)
+
+initial_content = start + header + client_div + initial_end
 
 # Start the Qt application
 app = QApplication(sys.argv)
@@ -26,7 +49,7 @@ def start_logger_thread(logger):
     logger_thread.start()
     return logger_thread
 
-logger = Logger()
+logger = Logger(path=log_path)
 logger_thread = start_logger_thread(logger)
 #
 
@@ -56,12 +79,50 @@ def fetch_table(message):
         row = table_row(*players)
         rows += row
 
-    output = start+rows+header+clientname+end
+    output = start+rows+header+client_div+end
+
     window.ui.html_display.setHtml(output)
 
 logger.log_signal.connect(fetch_table)
 
 
+
+
+
+
+
+
+
+
+
+def write(obj, val):
+    with open(config_path, 'r') as file:
+        config_data = json.load(file)
+
+    config_data[obj] = val
+
+    with open(config_path, 'w') as file:
+        json.dump(config_data, file, indent=4)
+
+def set_lunar():
+    write('Client', clients[0])
+    window.show_alert()
+def set_badlion():
+    write('Client', clients[1])
+    window.show_alert()
+
+def set_vanilla():
+    write('Client', clients[2])
+    window.show_alert()
+
+def set_random():
+    write('Client', clients[0])
+    window.show_alert()
+
+
+window.ui.actionLunar_Client.triggered.connect(set_lunar)
+window.ui.actionBadlion_Client.triggered.connect(set_badlion)
+window.ui.actionVanilla_Launcher.triggered.connect(set_vanilla)
 
 
 

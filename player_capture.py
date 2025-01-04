@@ -3,7 +3,7 @@ import subprocess
 
 class Logger(QObject):
     log_signal = pyqtSignal(str)
-    def __init__(self, path="C:/Users/EpicPichu/AppData/Roaming/.minecraft/logs/latest.log"):
+    def __init__(self, path):
         super().__init__()
         self.path = path
         self.process = None
@@ -19,10 +19,16 @@ class Logger(QObject):
         ForEach-Object {{ $_.Line -replace '.*\[CHAT\]', '' }} | 
         Where-Object {{ $_ -match "^[a-zA-Z0-9 _,]*$"}}
         '''
+        # STARTUPINFO to hide the window
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = subprocess.SW_HIDE  # Hide the window
+        
         self.process = subprocess.Popen(
             ["powershell", "-Command", command],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            startupinfo=startupinfo,
             text=True
         )
         try:
