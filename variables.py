@@ -7,9 +7,12 @@ vanilla = "data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AA
 
 config_path = 'configuration.json'
 
-config_template = {"Client": "Vanilla"}
+config_template = {
+"Client": "Vanilla",
+"Custom Log Path": ""
+}
 
-clients = ['Lunar Client', 'Badlion Client', 'Vanilla']
+clients = ['Lunar Client', 'Badlion Client', 'Vanilla', 'Custom']
 
 userdir = "C:/Users/" + getpass.getuser()
 
@@ -27,11 +30,15 @@ start = '''<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pichuwu</title>
+
+
+
   <style>
 * {
   color: white;
   font-family: 'Mojangles','Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 20px;
+  user-select: none;
 }
 
 body {
@@ -49,12 +56,13 @@ table{
 
 }
 
-td {
+td, th {
   border: 1px solid #626262;
   width: 0%;
   min-height: 32px;
   vertical-align: middle;
   line-height: 0;
+  font-weight: normal;
 }
 
 #head {
@@ -121,7 +129,95 @@ img {
   align-items: center;
 }
 
+.cursor {
+  font-size: inherit;
+}
+
+.cursor:hover {
+  cursor: pointer;
+  background-color: rgb(64, 64, 64)
+}
+
+.sorted-asc{
+  background-color: darkslategray;
+}
+.sorted-desc{
+  background-color: darkred;
+}
+
   </style>
+
+
+  
+  <script>
+
+const colorOrder = {
+  'white': 0,
+  'rgb(170, 0, 0)': 1,
+  'rgb(255, 170, 0)': 2,
+  'rgb(85, 255, 255)': 3,
+  'rgb(85, 255, 85)': 4,
+  'rgb(170, 170, 170)': 5
+};
+
+function sortable(columnIndex) {
+  const table = document.getElementById("main-table");
+  const tbody = table.tBodies[0];
+  const rows = Array.from(tbody.rows);
+
+  // Get the sort direction: ascending or descending
+  const isAscending = !table.querySelectorAll("th")[columnIndex].classList.contains("sorted-asc");
+
+  // Reset classes
+  table.querySelectorAll("th").forEach(th => th.classList.remove("sorted-asc", "sorted-desc"));
+
+  rows.sort((a, b) => {
+    let cellA = a.cells[columnIndex].textContent.trim();
+    let cellB = b.cells[columnIndex].textContent.trim();
+
+    if (columnIndex === 1) {
+      cellA = cellA.slice(1, -1);
+      cellB = cellB.slice(1, -1); 
+    }
+
+    // Handle numeric sorting
+    const numA = parseFloat(cellA);
+    const numB = parseFloat(cellB);
+
+    // If both cells are numeric, sort them numerically
+    if (!isNaN(numA) && !isNaN(numB)) {
+      return isAscending
+        ? numA - numB  // Ascending
+        : numB - numA; // Descending
+    }
+
+    // If they are not numeric, handle text color sorting (for text-based columns)
+    const colorA = window.getComputedStyle(a.cells[columnIndex]).color;
+    const colorB = window.getComputedStyle(b.cells[columnIndex]).color;
+
+    const colorNameA = colorOrder[colorA];
+    const colorNameB = colorOrder[colorB];
+
+    // If they are not numeric, compare based on the defined color order
+    return isAscending
+      ? colorNameA - colorNameB  // Ascending order by color
+      : colorNameB - colorNameA; // Descending order by color
+  });
+
+  // Reattach sorted rows
+  rows.forEach(row => tbody.appendChild(row));
+
+  // Update class to indicate sort direction
+  const th = table.querySelectorAll("th")[columnIndex];
+  th.classList.add(isAscending ? "sorted-asc" : "sorted-desc");
+}
+
+
+
+
+
+  </script>
+
 </head>
 
 
@@ -129,27 +225,27 @@ img {
 
 <body>
 
-<table>
+<table id="main-table">
 <thead>
 
 <tr id="sus">
-<td id="head">UwU</td>
-<td id="level">LVL</td>
-<td id="username" style="text-align: left; color: lightgoldenrodyellow;">&nbsp;Username</td>
-<td id="wins" style="color: lightpink;">Wins</td>
-<td id=wlr>WLR</td>
-<td id="finals" style="color: lightblue;">Finals</td>
-<td id="fkdr">FKDR</td>
-<td id="kills" style="color:lightgreen;">Kills</td>
-<td id="kdr">KDR</td>
-<td id="winstreak">WS</td>
-<td id="guild" style="color:papayawhip;">Guild</td>
+<th id="head">UwU</td>
+<th id="level" class="cursor" onclick="sortable(1)">LVL</td>
+<th id="username" class="cursor" style="text-align: left; color: lightgoldenrodyellow;" onclick="sortable(2)">&nbsp;Username</td>
+<th id="wins" class="cursor" style="color: lightcyan;" onclick="sortable(3)">Wins</td>
+<th id=wlr class="cursor" onclick="sortable(4)">WLR</td>
+<th id="finals" class="cursor" style="color: lightblue;" onclick="sortable(5)">Finals</td>
+<th id="fkdr" class="cursor" onclick="sortable(6)">FKDR</td>
+<th id="kills" class="cursor" style="color:lightgreen;" onclick="sortable(7)">Kills</td>
+<th id="kdr" class="cursor" onclick="sortable(8)">KDR</td>
+<th id="winstreak" class="cursor" onclick="sortable(9)">WS</td>
+<th id="guild" style="color:papayawhip;">Guild</td>
 </tr>
 
 </thead>
 
 <!-- Start of rows-->
-
+<tbody>
 '''
 
 sample_row = '''
@@ -170,7 +266,7 @@ sample_row = '''
 
 
 header = f'''
-
+</tbody>
 <!-- End of rows-->
 
 </table>
@@ -243,6 +339,15 @@ div_clients = {
 
 <div class="headerbox">
   <span style="color: lightgreen;">Vanilla</span>
+  &nbsp;<img src="{vanilla}" alt="owo" style="height: 30px; width: 30px;">
+</div>
+
+''',
+
+"Custom": f'''
+
+<div class="headerbox">
+  <span style="color: orange;">Custom</span>
   &nbsp;<img src="{vanilla}" alt="owo" style="height: 30px; width: 30px;">
 </div>
 

@@ -2,6 +2,12 @@ import asyncio, aiohttp
 
 colors = ['lightgray', 'lightcyan', 'lightblue', 'lightgreen', 'lightsalmon', 'lightcoral']
 
+rank_colors = {
+    'Champion': (170, 0, 0),     # Red
+    'Titan': (255, 170, 0),      # Orange
+    'Elite': (85, 255, 255),     # Cyan
+    'VIP': (85, 255, 85),        # Green
+}
 
 
 def map_value(x, in_min, in_max, out_min, out_max):
@@ -76,12 +82,6 @@ async def stats(username, interval='lifetime', gamemode='all_modes'):
         if lvl >= 35: level = f'<b style="color: {level_color}">[{level}]</b>'
         else: level = f'[{level}]'
 
-        rank_colors = {
-            'Champion': (170, 0, 0),     # Red
-            'Titan': (255, 170, 0),      # Orange
-            'Elite': (85, 255, 255),     # Cyan
-            'VIP': (85, 255, 85),        # Green
-            }
         
         ranksjson = str(api['ranks'])
         ranklist = ['Champion', 'Titan', 'Elite', 'VIP']

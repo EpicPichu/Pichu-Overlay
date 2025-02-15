@@ -33,7 +33,8 @@ except FileNotFoundError:
 
 client = config['Client']
 
-log_path = log_paths.get(client)
+if client == 'Custom': log_path = config['Custom Log Path']
+else: log_path = log_paths.get(client)
 client_div = div_clients.get(client)
 
 initial_content = start + header + client_div + initial_end
@@ -67,8 +68,12 @@ async def fetch_stats(usernames):
     results = await asyncio.gather(*[bwstats(ign) for ign in usernames])
     return results
 
-def fetch_table(message):
+def fetch_table(message: str):
+    if message.count(' ') != message.count(','):
+        return
+    
     usernames = message.split(", ")
+
     if len(usernames) < 2:
         return
     
@@ -115,14 +120,15 @@ def set_vanilla():
     write('Client', clients[2])
     window.show_alert()
 
-def set_random():
-    write('Client', clients[0])
+def set_custom():
+    write('Client', clients[3])
     window.show_alert()
 
 
 window.ui.actionLunar_Client.triggered.connect(set_lunar)
 window.ui.actionBadlion_Client.triggered.connect(set_badlion)
 window.ui.actionVanilla_Launcher.triggered.connect(set_vanilla)
+window.ui.actionCustom.triggered.connect(set_custom)
 
 
 
