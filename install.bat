@@ -11,10 +11,10 @@ if errorlevel 1 (
 
 REM Create a virtual environment
 echo Creating virtual environment...
-python -m venv venv
+python -m venv .venv
 
 REM Activate the virtual environment
-call venv\Scripts\activate
+call .venv\Scripts\activate
 
 REM Check if requirements.txt exists
 if not exist requirements.txt (
