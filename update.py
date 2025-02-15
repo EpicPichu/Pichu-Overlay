@@ -27,7 +27,7 @@ def delete_existing_files(repo_files):
         
         if os.path.exists(local_file_path):
             os.remove(local_file_path)
-            print(f"🗑 Deleted: {local_file_path}")
+            print(f" - Deleted: {local_file_path}")
 
 def download_file(file_path, download_url):
     """Download a fresh copy of a file from GitHub."""
@@ -39,16 +39,16 @@ def download_file(file_path, download_url):
     if response.status_code == 200:
         with open(local_file_path, "wb") as f:
             f.write(response.content)
-        print(f"⬇️ Downloaded: {file_path}")
+        print(f" + Downloaded: {file_path}")
     else:
-        print(f"❌ Failed to download {file_path}")
+        print(f" X Failed to download {file_path}")
 
 def sync_repo(path=""):
     """Delete existing files and download fresh copies from GitHub."""
     repo_files = get_repo_files(path)
 
     if not repo_files:
-        print("❌ No files found in repo. Exiting.")
+        print(" X No files found in repo. Exiting.")
         return
 
     delete_existing_files(repo_files)  # Delete existing files
