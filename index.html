@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pichu Overlay</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="index.js"></script>
+
+</head>
+
+
+
+
+<body>
+
+<!-- Header div -->
+
+<div id="header">
+
+  <div class="headerbox">
+    <img src="assets/pichu.png" alt="owo" style="height: 30px; width: 30px">&nbsp;
+    <a id="repolink" title="Click to download the overlay" href="https://github.com/EpicPichu/Pichu-Overlay">
+      <span style="color: rgb(255, 255, 150);">Pichu</span>
+      <span style="color: aquamarine;">Overlay</span>
+    </a>
+    &nbsp;<div id="settings" onclick="openConfig()">S E T</div> 
+  </div>
+
+  <!-- Client -->
+
+  <div class="headerbox">
+    <span id="status">(Waiting for connection)</span>
+    &nbsp;
+    <span id="clientname" style="color: darksalmon;">Waiting</span>
+    &nbsp;<img id="clienticon" src="assets/minecraft.png" alt="owo"
+      style="height: 30px; width: 30px; image-rendering: auto;">
+  </div>
+
+</div>
+
+<!-- Config div -->
+
+<div id="config-flex">
+
+  <div id="config-div">
+
+    <div id="config-title" style="display: flex; justify-content: space-between;">
+      <span>Pichu Overlay Configuration</span>
+      <u id="closebutton" onclick="closeConfig()">Close</u>
+    </div>
+
+    <div style="width: 100%; height: 2px; background-color: wheat; margin-top: 16px; margin-bottom: 16px;"></div>
+    <div id="client-selector">
+      Select Client
+    </div>
+    <form>
+      <label>
+        <input type="radio" name="choice" value="Lunar Client">
+        <span class="clientname" style="color: lightblue;">Lunar Client</span>
+      </label>
+      <label>
+        <input type="radio" name="choice" value="Badlion Client">
+        <span class="clientname" style="color: lightgoldenrodyellow;">Badlion Client</span>
+      </label>
+      <br>
+      <label>
+        <input type="radio" name="choice" value="Vanilla">
+        <span class="clientname" style="color: lightgreen">Vanilla</span>
+      </label>
+      <label>
+        <input type="radio" name="choice" value="Custom">
+        <span class="clientname" style="color: orange">Custom</span>
+      </label>
+    </form>
+    <br>
+    <div id="logpath-select" onclick="selectLog()">Custom Log Path <span style="color: lightgray;">(Click to select)</span></div>
+
+    <input id="logpath-input" type="text" style="margin-top: 16px" spellcheck="false" placeholder="None">
+
+    <div id="applytext">
+      Restart overlay to apply
+    </div>
+  </div>
+
+</div>
+
+<!-- Table -->
+
+<table id="main-table">
+  <thead>
+    <tr id="sus">
+      <th id="head">UwU</th>
+      <th id="level" class="cursor" onclick="sortable(1)" title="Click to sort&NewLine;Red&NewLine;Blue&NewLine;">LVL</th>
+      <th id="username" class="cursor" style="text-align: left; color: lightgoldenrodyellow;" onclick="sortable(2)">&nbsp;Players&nbsp;<span id="playercount">(0)</span></th>
+      <th id="wins" class="cursor" style="color: lightcyan;" onclick="sortable(3)">Wins</th>
+      <th id=wlr class="cursor" onclick="sortable(4)">WLR</th>
+      <th id="finals" class="cursor" style="color: lightblue;" onclick="sortable(5)">Finals</th>
+      <th id="fkdr" class="cursor" onclick="sortable(6)">FKDR</th>
+      <th id="kills" class="cursor" style="color:lightgreen;" onclick="sortable(7)">Kills</th>
+      <th id="kdr" class="cursor" onclick="sortable(8)">KDR</th>
+      <th id="winstreak" class="cursor" onclick="sortable(9)">WS</th>
+      <th id="guild" style="color:papayawhip;">Guild</th>
+    </tr>
+  </thead>
+
+  <!-- Start of rows-->
+  <tbody>
+    
+  </tbody>
+  <!-- End of rows-->
+  
+</table>
+
+
+
+</body>
+
+</html>
