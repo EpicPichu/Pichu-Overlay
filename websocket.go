@@ -288,6 +288,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Client connected")
 	conn.WriteMessage(websocket.TextMessage, []byte("CLIENT: "+*client))
+	conn.WriteMessage(websocket.TextMessage, []byte("LOG_PATH: "+*logpath))
 
 	// Start the PowerShell command in a separate goroutine
 	cmd := start_powershell(script(*logpath), conn)

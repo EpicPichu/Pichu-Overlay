@@ -132,7 +132,7 @@ class StatsFetcher {
 
             const guild = profileData.clan ? profileData.clan.tag : '-';
 
-            if (!stats.ok) return [this.username, level, levelColor, rankColor, guild];
+            if (stats.status != 200) return [this.username, level, levelColor, rankColor, guild];
 
             const statsData = await stats.json();
 
@@ -259,6 +259,9 @@ function rowClear() {
     } else {
         console.error('Table with ID "main-table" not found!');
     }
+
+    document.getElementById('title').textContent = "Pichu Overlay (0)"
+    document.getElementById('playercount').textContent = "(0)"
 }
 
 function openConfig() {
@@ -296,12 +299,13 @@ socket.onmessage = async function (event) {
     console.log('Received message: ' + event.data);
 
     if (event.data.startsWith('TAB: ')) {
+        rowClear()
         let string = event.data.substring(5);
         let usernames = string.split(', ');
         document.getElementById('playercount').textContent = `(${usernames.length})`
+        document.getElementById('title').textContent = `Pichu Overlay (${usernames.length})`
         let stats = await asyncfetcher(usernames);
 
-        rowClear()
         stats.forEach(stats => {
             rowAppend(rowfetcher(...stats));
         });
@@ -324,6 +328,7 @@ socket.onmessage = async function (event) {
     if (event.data.startsWith("PLAYERCOUNT: ")) {
         let playercount = event.data.substring(13);
         document.getElementById('playercount').textContent = playercount
+        document.getElementById('title').textContent = "Pichu Overlay " + playercount
     }
 
     if (event.data.startsWith('CLIENT: ')) {
