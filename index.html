@@ -23,7 +23,7 @@
 
   <div class="headerbox">
     <img src="assets/pichu.png" alt="owo" style="height: 30px; width: 30px">&nbsp;
-    <a id="repolink" title="Click to download the overlay" href="https://github.com/EpicPichu/Pichu-Overlay">
+    <a id="repolink" title="Click to download the overlay" href="https://github.com/EpicPichu/Pichu-Overlay" target="_blank"  rel="noopener noreferrer">
       <span style="color: rgb(255, 255, 150);">Pichu</span>
       <span style="color: aquamarine;">Overlay</span>
     </a>
@@ -47,7 +47,7 @@
 
 <!-- Config div -->
 
-<div id="config-flex">
+<div id="config-flex" style="display: none; opacity: 0;">
 
   <div id="config-div">
 
@@ -97,15 +97,15 @@
   <thead>
     <tr id="sus">
       <th id="head">UwU</th>
-      <th id="level" class="cursor" onclick="sortable(1)" title="Click to sort&NewLine;Red&NewLine;Blue&NewLine;">LVL</th>
-      <th id="username" class="cursor" style="text-align: left; color: lightgoldenrodyellow;" onclick="sortable(2)">&nbsp;Players&nbsp;<span id="playercount">(0)</span></th>
-      <th id="wins" class="cursor" style="color: lightcyan;" onclick="sortable(3)">Wins</th>
-      <th id=wlr class="cursor" onclick="sortable(4)">WLR</th>
-      <th id="finals" class="cursor" style="color: lightblue;" onclick="sortable(5)">Finals</th>
-      <th id="fkdr" class="cursor" onclick="sortable(6)">FKDR</th>
-      <th id="kills" class="cursor" style="color:lightgreen;" onclick="sortable(7)">Kills</th>
-      <th id="kdr" class="cursor" onclick="sortable(8)">KDR</th>
-      <th id="winstreak" class="cursor" onclick="sortable(9)">WS</th>
+      <th id="level" class="cursor sorted-desc" onclick="togglesorting(1)" title="Click to sort&NewLine;Red&NewLine;Blue&NewLine;">LVL</th>
+      <th id="username" class="cursor" style="text-align: left; color: lightgoldenrodyellow;" onclick="togglesorting(2)">&nbsp;Players&nbsp;<span id="playercount">(0)</span></th>
+      <th id="wins" class="cursor" style="color: lightcyan;" onclick="togglesorting(3)">Wins</th>
+      <th id=wlr class="cursor" onclick="togglesorting(4)">WLR</th>
+      <th id="finals" class="cursor" style="color: lightblue;" onclick="togglesorting(5)">Finals</th>
+      <th id="fkdr" class="cursor" onclick="togglesorting(6)">FKDR</th>
+      <th id="kills" class="cursor" style="color:lightgreen;" onclick="togglesorting(7)">Kills</th>
+      <th id="kdr" class="cursor" onclick="togglesorting(8)">KDR</th>
+      <th id="winstreak" class="cursor" onclick="togglesorting(9)">WS</th>
       <th id="guild" style="color:papayawhip;">Guild</th>
     </tr>
   </thead>

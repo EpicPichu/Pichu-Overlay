@@ -1,4 +1,7 @@
-Get-Content -Path "C:\Users\EpicPichu\AppData\Roaming\.minecraft\logs\latest.log" -Tail 0 -Wait |
+param (
+    [string]$Path = ".\latest.log"
+)
+Get-Content -Path $Path -Tail 0 -Wait |
 Select-String -Pattern "\[CHAT\]" |
 ForEach-Object {
     # Extract the chat message by removing everything before [CHAT]

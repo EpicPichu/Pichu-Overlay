@@ -177,7 +177,7 @@ img {
 }
 
 #config-flex {
-    display: none;
+    transition: 100ms ease-in-out;
     align-items: center;
     justify-content: center;
     position: fixed;

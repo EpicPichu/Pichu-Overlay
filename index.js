@@ -1,4 +1,9 @@
 const version = '0.9'
+let apiCache = {};
+let sorting = 1;
+let direction = false;
+
+
 
 const colorOrder = {
     'rgb(255, 255, 255)': 1,
@@ -9,22 +14,40 @@ const colorOrder = {
     'rgb(170, 170, 170)': 6
 };
 
-function sortable(columnIndex) {
+function togglesorting(columnIndex) {
+    sorting = columnIndex;
+    const table = document.getElementById("main-table");
+    const th = table.querySelectorAll("th")[sorting];
+
+    // Get the sort direction: ascending or descending
+    if (!th.classList.contains("sorted-asc") && !th.classList.contains("sorted-desc")) {
+        isAscending = false; // First click: descending
+    } else if (th.classList.contains("sorted-desc")) {
+        isAscending = true; // Toggle to ascending
+    } else {
+        isAscending = false; // Toggle back to descending
+    }
+    // Reset all header sort classes
+    table.querySelectorAll("th").forEach(th => th.classList.remove("sorted-asc", "sorted-desc"));
+
+    // Set the new sort direction class
+    th.classList.add(isAscending ? "sorted-asc" : "sorted-desc");
+
+    direction = isAscending;
+    sortable();
+}
+
+function sortable() {
     const table = document.getElementById("main-table");
     const tbody = table.tBodies[0];
     const rows = Array.from(tbody.rows);
 
-    // Get the sort direction: ascending or descending
-    const isAscending = !table.querySelectorAll("th")[columnIndex].classList.contains("sorted-asc");
-
-    // Reset classes
-    table.querySelectorAll("th").forEach(th => th.classList.remove("sorted-asc", "sorted-desc"));
 
     rows.sort((a, b) => {
-        let cellA = a.cells[columnIndex].textContent.trim();
-        let cellB = b.cells[columnIndex].textContent.trim();
+        let cellA = a.cells[sorting].textContent.trim();
+        let cellB = b.cells[sorting].textContent.trim();
 
-        if (columnIndex === 1) {
+        if (sorting === 1) {
             cellA = cellA.slice(1, -1);
             cellB = cellB.slice(1, -1);
         }
@@ -35,30 +58,26 @@ function sortable(columnIndex) {
 
         // If both cells are numeric, sort them numerically
         if (!isNaN(numA) && !isNaN(numB)) {
-            return isAscending
+            return direction
                 ? numA - numB  // Ascending
                 : numB - numA; // Descending
         }
 
         // If they are not numeric, handle text color sorting (for text-based columns)
-        const colorA = window.getComputedStyle(a.cells[columnIndex]).color;
-        const colorB = window.getComputedStyle(b.cells[columnIndex]).color;
+        const colorA = window.getComputedStyle(a.cells[sorting]).color;
+        const colorB = window.getComputedStyle(b.cells[sorting]).color;
 
         const colorNameA = colorOrder[colorA];
         const colorNameB = colorOrder[colorB];
 
         // If they are not numeric, compare based on the defined color order
-        return isAscending
+        return direction
             ? colorNameA - colorNameB  // Ascending order by color
             : colorNameB - colorNameA; // Descending order by color
     });
 
     // Reattach sorted rows
     rows.forEach(row => tbody.appendChild(row));
-
-    // Update class to indicate sort direction
-    const th = table.querySelectorAll("th")[columnIndex];
-    th.classList.add(isAscending ? "sorted-asc" : "sorted-desc");
 }
 
 class StatsFetcher {
@@ -117,22 +136,42 @@ class StatsFetcher {
 
     async fetchStats() {
         try {
+
+            if (apiCache[this.username]) {
+                return apiCache[this.username];
+            }
+
             const profileResponse = fetch(`https://stats.pika-network.net/api/profile/${this.username}`);
             const statsResponse = fetch(`https://stats.pika-network.net/api/profile/${this.username}/leaderboard?type=BEDWARS&interval=${this.interval}&mode=${this.gamemode}`);
-
+            
             const [profile, stats] = await Promise.all([profileResponse, statsResponse]);
-            if (!profile.ok) return [this.username];
+            
+            if (![200, 429].includes(profile.status)) {
+                apiCache[this.username] = this.username;
+                return [this.username];
+            }   if (profile.status == 429) return [this.username];
 
             const profileData = await profile.json();
+
+            if (!profileData.rank) {
+                apiCache[this.username] = this.username;
+                return [this.username];
+            }
+
             const level = profileData.rank.level;
             const levelColor = this.getLevelColor(level);
-
+            
             const rank = this.getRank(profileData.ranks)
             const rankColor = this.rankColors[rank] || [170, 170, 170];
 
             const guild = profileData.clan ? profileData.clan.tag : '-';
+            
 
-            if (stats.status != 200) return [this.username, level, levelColor, rankColor, guild];
+            if (![200, 429].includes(stats.status)) {
+                parsedStats = [this.username, level, levelColor, rankColor, guild];
+                apiCache[this.username] = parsedStats;
+                return parsedStats;
+            }   if (stats.status == 429) return [this.username, level, levelColor, rankColor, guild];
 
             const statsData = await stats.json();
 
@@ -156,13 +195,17 @@ class StatsFetcher {
             const winstreak = getStat('Highest winstreak reached');
             const winstreakColor = this.mapValue(winstreak, 0, 360, 0, 5);
 
-            return [
+            let parsedStats = [
                 this.username, level, levelColor, rankColor, guild,
                 wins, winsColor, wlr,
                 fkills, fkillsColor, fkdr,
                 kills, killsColor, kdr,
                 winstreak, winstreakColor
-            ];
+            ]
+
+            apiCache[this.username] = parsedStats;
+
+            return parsedStats;
 
         } catch (error) {
             console.error('Error fetching stats:', error);
@@ -176,6 +219,20 @@ async function asyncfetcher(usernames) {
     const results = await Promise.all(fetchers);
     return results
 }
+
+function parseUsers(usernames = []) {
+    const rows = document.querySelectorAll('tbody tr');
+    const titles = new Set;
+
+    rows.forEach(row => {
+        if (row.title) {
+            titles.add(row.title);
+        }
+    });
+
+    return Array.from(new Set([...usernames].filter(item => !titles.has(item))));
+}
+
 
 function rowfetcher(username, level = '0', levelColor = 'white', rankColor = 'white', guild = 'NICKED',
     wins = '-', winsColor = 'white', wlr = '-',
@@ -267,11 +324,17 @@ function rowClear() {
 function openConfig() {
     const modal = document.getElementById("config-flex");
     modal.style.display = "flex";
+    setTimeout(() => {
+        modal.style.opacity = "100%";
+    }, 1);
 }
 
 function closeConfig() {
     const modal = document.getElementById("config-flex");
-    modal.style.display = "none";
+    modal.style.opacity = "0%";
+    setTimeout(() => {
+        modal.style.display = "none";
+    }, 100);
 }
 
 var socket = new WebSocket('ws://127.0.0.1:6969/ws');
@@ -300,29 +363,33 @@ socket.onmessage = async function (event) {
 
     if (event.data.startsWith('TAB: ')) {
         rowClear()
+
         let string = event.data.substring(5);
-        let usernames = string.split(', ');
+        let usernames = parseUsers(string.split(', '));
+
         document.getElementById('playercount').textContent = `(${usernames.length})`
         document.getElementById('title').textContent = `Pichu Overlay (${usernames.length})`
         let stats = await asyncfetcher(usernames);
-
         stats.forEach(stats => {
             rowAppend(rowfetcher(...stats));
         });
 
+        sortable(sorting);
     };
 
     if (event.data.startsWith("JOIN: ")) {
-        let username = [event.data.substring(6)];
+        let username = parseUsers([event.data.substring(6)]);
         let stats = await asyncfetcher(username);
         stats.forEach(stats => {
             rowAppend(rowfetcher(...stats));
         });
+        sortable(sorting);
     }
 
     if (event.data.startsWith("LEAVE: ")) {
         let username = event.data.substring(7);
         rowRemove(username);
+        sortable(sorting);
     }
 
     if (event.data.startsWith("PLAYERCOUNT: ")) {
