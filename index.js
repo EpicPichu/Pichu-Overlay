@@ -168,7 +168,7 @@ class StatsFetcher {
             
 
             if (![200, 429].includes(stats.status)) {
-                parsedStats = [this.username, level, levelColor, rankColor, guild];
+                let parsedStats = [this.username, level, levelColor, rankColor, guild];
                 apiCache[this.username] = parsedStats;
                 return parsedStats;
             }   if (stats.status == 429) return [this.username, level, levelColor, rankColor, guild];
