@@ -147,14 +147,14 @@ class StatsFetcher {
             const [profile, stats] = await Promise.all([profileResponse, statsResponse]);
             
             if (![200, 429].includes(profile.status)) {
-                apiCache[this.username] = this.username;
+                apiCache[this.username] = [this.username];
                 return [this.username];
             }   if (profile.status == 429) return [this.username];
 
             const profileData = await profile.json();
 
             if (!profileData.rank) {
-                apiCache[this.username] = this.username;
+                apiCache[this.username] = [this.username];
                 return [this.username];
             }
 
