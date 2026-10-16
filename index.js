@@ -141,8 +141,8 @@ class StatsFetcher {
                 return apiCache[this.username];
             }
 
-            const profileResponse = fetch(`https://stats.pika-network.net/api/profile/${this.username}`);
-            const statsResponse = fetch(`https://stats.pika-network.net/api/profile/${this.username}/leaderboard?type=BEDWARS&interval=${this.interval}&mode=${this.gamemode}`);
+            const profileResponse = fetch(`https://stats.pika-network.net/web-api/proxy/profile/${this.username}`);
+            const statsResponse = fetch(`https://stats.pika-network.net/web-api/proxy/profile/${this.username}/leaderboard?type=BEDWARS&interval=${this.interval}&mode=${this.gamemode}`);
             
             const [profile, stats] = await Promise.all([profileResponse, statsResponse]);
             
